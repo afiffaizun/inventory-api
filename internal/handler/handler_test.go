@@ -39,7 +39,9 @@ func TestHome(t *testing.T) {
 	}
 
 	var resp model.Response
-	json.NewDecoder(w.Body).Decode(&resp)
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 
 	if resp.Application != "Inventory API" {
 		t.Errorf("expected application 'Inventory API', got '%s'", resp.Application)
@@ -59,7 +61,9 @@ func TestHealth(t *testing.T) {
 	}
 
 	var resp map[string]string
-	json.NewDecoder(w.Body).Decode(&resp)
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 
 	if resp["status"] != "UP" {
 		t.Errorf("expected status 'UP', got '%s'", resp["status"])
@@ -79,7 +83,9 @@ func TestVersion(t *testing.T) {
 	}
 
 	var resp model.Response
-	json.NewDecoder(w.Body).Decode(&resp)
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
 
 	if resp.Version != "v1.0.0" {
 		t.Errorf("expected version 'v1.0.0', got '%s'", resp.Version)
