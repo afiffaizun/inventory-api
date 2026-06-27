@@ -1,6 +1,6 @@
 module github.com/afiffazun/inventory-api
 
-go 1.26.4
+go 1.22
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
