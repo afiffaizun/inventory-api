@@ -1,3 +1,5 @@
 inventory-api
 .env
 *.log
+api
+agent-skills/   

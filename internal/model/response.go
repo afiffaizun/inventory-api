@@ -6,3 +6,10 @@ type Response struct {
 	Status      string `json:"status,omitempty"`
 	Version     string `json:"version,omitempty"`
 }
+
+type ErrorResponse struct {
+	Error struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	} `json:"error"`
+}
