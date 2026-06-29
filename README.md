@@ -85,6 +85,17 @@ docker-compose up -d
 
 - Frontend: http://localhost:3000
 - API: http://localhost:8080
+- Adminer: http://localhost:8081
+
+**Adminer Login Settings:**
+
+| Field | Value |
+|-------|-------|
+| System | PostgreSQL |
+| Server | `db` |
+| Username | `postgres` |
+| Password | `postgres` |
+| Database | `inventory_db` |
 
 ### Development Setup
 
