@@ -1,18 +1,18 @@
 services:
   app:
-    build: .
+    build: ./backend
     container_name: inventory-api
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - ./backend/.env
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
 
   web:
-    build: ./web
+    build: ./frontend
     container_name: inventory-web
     ports:
       - "3000:80"

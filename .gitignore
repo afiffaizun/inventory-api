@@ -1,7 +1,32 @@
+# Binaries
 inventory-api
-.env
-*.log
 api
-agent-skills/
-web/node_modules/
-web/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Environment
+.env
+
+# Logs
+*.log
+
+# Dependencies
+backend/vendor/
+frontend/node_modules/
+
+# Build
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+agent-skills

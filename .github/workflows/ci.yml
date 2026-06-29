@@ -16,10 +16,12 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
+          working-directory: backend
 
       - uses: golangci/golangci-lint-action@v7
         with:
           version: latest
+          working-directory: backend
 
   test:
     name: Test
@@ -54,9 +56,11 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
+          working-directory: backend
 
       - name: Run tests
         run: go test ./... -v -cover -race
+        working-directory: backend
 
   build:
     name: Build
@@ -68,15 +72,17 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
+          working-directory: backend
 
       - name: Build
         run: go build -o inventory-api ./cmd/api
+        working-directory: backend
 
       - name: Upload binary
         uses: actions/upload-artifact@v5
         with:
           name: inventory-api
-          path: inventory-api
+          path: backend/inventory-api
 
   docker:
     name: Docker Build & Push
@@ -111,7 +117,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./backend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

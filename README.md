@@ -1,12 +1,12 @@
-# Inventory API
+# Inventory System
 
-Simple REST API for inventory management built with Go, PostgreSQL, and GORM.
+Full-stack inventory management system with Go backend and Vue 3 frontend.
 
 ## Features
 
 - Full CRUD operations for items
 - PostgreSQL database with GORM ORM
-- Configuration via `.env`
+- Vue 3 frontend with PrimeVue components
 - Docker support
 - GitHub Actions CI/CD
 - Unit tests with 75%+ coverage
@@ -15,27 +15,46 @@ Simple REST API for inventory management built with Go, PostgreSQL, and GORM.
 
 | Component | Technology |
 |-----------|------------|
+| **Backend** | |
 | Language | Go 1.22 |
 | Database | PostgreSQL 16 |
 | ORM | GORM v2 |
 | Config | godotenv |
+| **Frontend** | |
+| Framework | Vue 3 (Composition API) |
+| Build | Vite |
+| Language | TypeScript |
+| CSS | Tailwind CSS |
+| Components | PrimeVue 4 |
+| **DevOps** | |
 | Container | Docker + Docker Compose |
 | CI/CD | GitHub Actions |
 
 ## Project Structure
 
 ```
-├── cmd/api/                # Entry point
-├── internal/
-│   ├── config/             # Configuration
-│   ├── database/           # DB connection
-│   ├── handler/            # HTTP handlers
-│   ├── model/              # Data models
-│   ├── repository/         # DB operations
-│   └── service/            # Business logic
-├── Dockerfile
+├── backend/                 # Go API server
+│   ├── cmd/api/             # Entry point
+│   ├── internal/
+│   │   ├── config/          # Configuration
+│   │   ├── database/        # DB connection
+│   │   ├── handler/         # HTTP handlers
+│   │   ├── model/           # Data models
+│   │   ├── repository/      # DB operations
+│   │   └── service/         # Business logic
+│   ├── go.mod
+│   ├── go.sum
+│   └── Dockerfile
+├── frontend/                # Vue 3 app
+│   ├── src/
+│   │   ├── api/             # API service
+│   │   ├── components/      # Vue components
+│   │   ├── views/           # Page views
+│   │   └── types/           # TypeScript types
+│   ├── package.json
+│   └── Dockerfile
 ├── docker-compose.yaml
-└── .env.example
+└── README.md
 ```
 
 ## Getting Started
@@ -43,6 +62,7 @@ Simple REST API for inventory management built with Go, PostgreSQL, and GORM.
 ### Prerequisites
 
 - Go 1.22+
+- Node.js 20+
 - Docker & Docker Compose (optional)
 - PostgreSQL (if not using Docker)
 
@@ -55,38 +75,33 @@ git clone https://github.com/afiffaizun/inventory-api.git
 cd inventory-api
 ```
 
-2. Copy environment file
-
-```bash
-cp .env.example .env
-```
-
-3. Run with Docker Compose
+2. Start all services
 
 ```bash
 docker-compose up -d
 ```
 
-4. Test the API
+3. Access the application
+
+- Frontend: http://localhost:3000
+- API: http://localhost:8080
+
+### Development Setup
+
+**Backend:**
 
 ```bash
-curl http://localhost:8080/health
-```
-
-### Manual Setup
-
-1. Start PostgreSQL and create database `inventory_db`
-
-2. Copy and configure `.env`
-
-```bash
+cd backend
 cp .env.example .env
+go run ./cmd/api
 ```
 
-3. Run the application
+**Frontend:**
 
 ```bash
-go run ./cmd/api
+cd frontend
+npm install
+npm run dev
 ```
 
 ## API Endpoints
@@ -102,66 +117,24 @@ go run ./cmd/api
 | PUT | `/items/{id}` | Update item |
 | DELETE | `/items/{id}` | Delete item |
 
-### Examples
-
-**Create Item**
-
-```bash
-curl -X POST http://localhost:8080/items \
-  -H "Content-Type: application/json" \
-  -d '{"code":"ITEM001","name":"Laptop","stock":10,"location":"Gudang A"}'
-```
-
-**Get All Items**
-
-```bash
-curl http://localhost:8080/items
-```
-
-**Get Item by ID**
-
-```bash
-curl http://localhost:8080/items/1
-```
-
-**Update Item**
-
-```bash
-curl -X PUT http://localhost:8080/items/1 \
-  -H "Content-Type: application/json" \
-  -d '{"code":"ITEM001","name":"Laptop Updated","stock":5}'
-```
-
-**Delete Item**
-
-```bash
-curl -X DELETE http://localhost:8080/items/1
-```
-
-## Testing
-
-```bash
-# Run all tests
-go test ./... -v
-
-# Run with coverage
-go test ./... -cover
-
-# Run specific package
-go test ./internal/handler/ -v
-```
-
 ## Development
 
+**Backend:**
+
 ```bash
-# Build binary
-go build -o inventory-api ./cmd/api
+cd backend
+go run ./cmd/api          # Run server
+go test ./... -v          # Run tests
+go build -o api ./cmd/api # Build binary
+```
 
-# Run linter
-golangci-lint run
+**Frontend:**
 
-# Run locally without Docker
-go run ./cmd/api
+```bash
+cd frontend
+npm run dev               # Dev server
+npm run build             # Production build
+npm run lint              # Lint code
 ```
 
 ## CI/CD
