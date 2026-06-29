@@ -2,4 +2,6 @@ inventory-api
 .env
 *.log
 api
-agent-skills/   
+agent-skills/
+web/node_modules/
+web/dist/
