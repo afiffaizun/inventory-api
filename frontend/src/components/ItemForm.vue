@@ -43,6 +43,14 @@ watch(
   }
 )
 
+watch(
+  form,
+  () => {
+    errors.value = {}
+  },
+  { deep: true }
+)
+
 const validate = (): boolean => {
   errors.value = {}
 
