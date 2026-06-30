@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import ItemView from './views/ItemView.vue'
+import AppLayout from './components/AppLayout.vue'
 </script>
 
 <template>
-  <ItemView />
+  <AppLayout>
+    <router-view />
+  </AppLayout>
 </template>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Button from 'primevue/button'
-import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import ItemTable from '../components/ItemTable.vue'
@@ -167,10 +166,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <Toast />
-    <ConfirmDialog />
-
+  <div>
     <div class="max-w-7xl mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
         <div>
