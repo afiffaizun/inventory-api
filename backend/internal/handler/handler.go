@@ -216,14 +216,18 @@ func ExportItems(w http.ResponseWriter, r *http.Request) {
 	writer := csv.NewWriter(w)
 	defer writer.Flush()
 
-	writer.Write([]string{"Code", "Name", "Stock", "Location"})
+	if err := writer.Write([]string{"Code", "Name", "Stock", "Location"}); err != nil {
+		return
+	}
 
 	for _, item := range items {
-		writer.Write([]string{
+		if err := writer.Write([]string{
 			item.Code,
 			item.Name,
 			strconv.Itoa(item.Stock),
 			item.Location,
-		})
+		}); err != nil {
+			return
+		}
 	}
 }
