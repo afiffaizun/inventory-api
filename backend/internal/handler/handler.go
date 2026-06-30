@@ -113,8 +113,8 @@ func CreateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if item.Code == "" || item.Name == "" {
-		respondError(w, http.StatusBadRequest, "VALIDATION_ERROR", "Code and Name are required")
+	if errs := item.Validate(); len(errs) > 0 {
+		respondJSON(w, http.StatusBadRequest, model.ValidationErrors{Errors: errs})
 		return
 	}
 
@@ -153,6 +153,11 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	}
 	if item.Name == "" {
 		item.Name = existing.Name
+	}
+
+	if errs := item.Validate(); len(errs) > 0 {
+		respondJSON(w, http.StatusBadRequest, model.ValidationErrors{Errors: errs})
+		return
 	}
 
 	if err := service.UpdateItem(uint(id), &item); err != nil {

@@ -285,13 +285,67 @@ func TestCreateItem(t *testing.T) {
 			name:       "validation error - empty body",
 			body:       `{}`,
 			wantStatus: http.StatusBadRequest,
-			wantCode:   "VALIDATION_ERROR",
+			checkResp: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var resp model.ValidationErrors
+				decodeJSON(t, w, &resp)
+				if len(resp.Errors) != 2 {
+					t.Errorf("expected 2 errors, got %d", len(resp.Errors))
+				}
+			},
 		},
 		{
 			name:       "validation error - invalid JSON",
 			body:       `invalid json`,
 			wantStatus: http.StatusBadRequest,
 			wantCode:   "VALIDATION_ERROR",
+		},
+		{
+			name:       "validation error - negative stock",
+			body:       `{"code":"ITEM001","name":"Laptop","stock":-5}`,
+			wantStatus: http.StatusBadRequest,
+			checkResp: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var resp model.ValidationErrors
+				decodeJSON(t, w, &resp)
+				if len(resp.Errors) != 1 || resp.Errors[0].Field != "stock" {
+					t.Errorf("expected stock error, got %v", resp.Errors)
+				}
+			},
+		},
+		{
+			name:       "validation error - code too long",
+			body:       `{"code":"THIS_CODE_IS_WAY_TOO_LONG_FOR_THE_DATABASE_FIELD_THAT_ONLY_ALLOWS_50_CHARACTERS","name":"Laptop","stock":10}`,
+			wantStatus: http.StatusBadRequest,
+			checkResp: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var resp model.ValidationErrors
+				decodeJSON(t, w, &resp)
+				if len(resp.Errors) != 1 || resp.Errors[0].Field != "code" {
+					t.Errorf("expected code error, got %v", resp.Errors)
+				}
+			},
+		},
+		{
+			name:       "validation error - code invalid format",
+			body:       `{"code":"ITEM@001","name":"Laptop","stock":10}`,
+			wantStatus: http.StatusBadRequest,
+			checkResp: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var resp model.ValidationErrors
+				decodeJSON(t, w, &resp)
+				if len(resp.Errors) != 1 || resp.Errors[0].Field != "code" {
+					t.Errorf("expected code error, got %v", resp.Errors)
+				}
+			},
+		},
+		{
+			name:       "validation error - multiple errors",
+			body:       `{"code":"","name":"","stock":-1}`,
+			wantStatus: http.StatusBadRequest,
+			checkResp: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var resp model.ValidationErrors
+				decodeJSON(t, w, &resp)
+				if len(resp.Errors) != 3 {
+					t.Errorf("expected 3 errors, got %d", len(resp.Errors))
+				}
+			},
 		},
 	}
 

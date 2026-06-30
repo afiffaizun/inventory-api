@@ -21,3 +21,12 @@ type PaginatedResponse[T any] struct {
 	Total      int64 `json:"total"`
 	TotalPages int   `json:"total_pages"`
 }
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+type ValidationErrors struct {
+	Errors []ValidationError `json:"errors"`
+}
