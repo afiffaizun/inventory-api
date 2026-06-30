@@ -46,3 +46,61 @@ func GetItemsWithFilter(filter repository.SearchFilter, page, limit int) ([]mode
 func ExportItems(filter repository.SearchFilter) ([]model.Item, error) {
 	return repository.ExportItems(filter)
 }
+
+// Warehouse functions
+func GetWarehouses(filter repository.WarehouseFilter, page, limit int) ([]model.Warehouse, int64, error) {
+	return repository.GetWarehouses(filter, page, limit)
+}
+
+func GetAllWarehouses() ([]model.Warehouse, error) {
+	return repository.GetAllWarehouses()
+}
+
+func GetWarehouseByID(id uint) (*model.Warehouse, error) {
+	return repository.GetWarehouseByID(id)
+}
+
+func CreateWarehouse(warehouse *model.Warehouse) error {
+	return repository.CreateWarehouse(warehouse)
+}
+
+func UpdateWarehouse(id uint, warehouse *model.Warehouse) error {
+	return repository.UpdateWarehouse(id, warehouse)
+}
+
+func DeleteWarehouse(id uint) error {
+	return repository.DeleteWarehouse(id)
+}
+
+func SetDefaultWarehouse(id uint) error {
+	return repository.SetDefaultWarehouse(id)
+}
+
+// Category functions
+func GetCategories(filter repository.CategoryFilter, page, limit int) ([]model.Category, int64, error) {
+	return repository.GetCategories(filter, page, limit)
+}
+
+func GetAllCategories() ([]model.Category, error) {
+	return repository.GetAllCategories()
+}
+
+func GetCategoryTree() ([]model.CategoryTree, error) {
+	return repository.GetCategoryTree()
+}
+
+func GetCategoryByID(id uint) (*model.Category, error) {
+	return repository.GetCategoryByID(id)
+}
+
+func CreateCategory(category *model.Category) error {
+	return repository.CreateCategory(category)
+}
+
+func UpdateCategory(id uint, category *model.Category) error {
+	return repository.UpdateCategory(id, category)
+}
+
+func DeleteCategory(id uint) error {
+	return repository.DeleteCategory(id)
+}

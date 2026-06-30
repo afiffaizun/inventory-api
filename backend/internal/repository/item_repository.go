@@ -7,10 +7,13 @@ import (
 )
 
 type SearchFilter struct {
-	Search   string
-	Location string
-	MinStock int
-	MaxStock int
+	Search      string
+	Location    string
+	CategoryID  *uint
+	WarehouseID *uint
+	MinStock    int
+	MaxStock    int
+	IsActive    *bool
 }
 
 func GetAllItems() ([]model.Item, error) {
@@ -80,12 +83,24 @@ func applyFilter(query *gorm.DB, filter SearchFilter) *gorm.DB {
 		query = query.Where("location = ?", filter.Location)
 	}
 
+	if filter.CategoryID != nil {
+		query = query.Where("category_id = ?", *filter.CategoryID)
+	}
+
+	if filter.WarehouseID != nil {
+		query = query.Where("warehouse_id = ?", *filter.WarehouseID)
+	}
+
 	if filter.MinStock > 0 {
 		query = query.Where("stock >= ?", filter.MinStock)
 	}
 
 	if filter.MaxStock > 0 {
 		query = query.Where("stock <= ?", filter.MaxStock)
+	}
+
+	if filter.IsActive != nil {
+		query = query.Where("is_active = ?", *filter.IsActive)
 	}
 
 	return query

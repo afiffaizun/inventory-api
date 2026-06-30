@@ -69,6 +69,7 @@ func createTestItem(t *testing.T, code, name string, stock int, location string)
 	item := model.Item{
 		Code:     code,
 		Name:     name,
+		SKU:      code + "-SKU",
 		Stock:    stock,
 		Location: location,
 	}
@@ -117,4 +118,32 @@ func executeRequestWithQuery(t *testing.T, method, path, body string, handler ht
 	handler(w, req)
 
 	return w
+}
+
+func createTestWarehouse(t *testing.T, code, name string) string {
+	t.Helper()
+
+	warehouse := model.Warehouse{
+		Code: code,
+		Name: name,
+	}
+	result := database.DB.Create(&warehouse)
+	if result.Error != nil {
+		t.Fatalf("failed to create test warehouse: %v", result.Error)
+	}
+	return strconv.FormatUint(uint64(warehouse.ID), 10)
+}
+
+func createTestCategory(t *testing.T, code, name string) string {
+	t.Helper()
+
+	category := model.Category{
+		Code: code,
+		Name: name,
+	}
+	result := database.DB.Create(&category)
+	if result.Error != nil {
+		t.Fatalf("failed to create test category: %v", result.Error)
+	}
+	return strconv.FormatUint(uint64(category.ID), 10)
 }

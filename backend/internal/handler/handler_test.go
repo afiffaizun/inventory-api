@@ -23,6 +23,8 @@ func TestMain(m *testing.M) {
 
 func setupTest() {
 	database.DB.Exec("DELETE FROM items")
+	database.DB.Exec("DELETE FROM warehouses")
+	database.DB.Exec("DELETE FROM categories")
 }
 
 func TestHome(t *testing.T) {
