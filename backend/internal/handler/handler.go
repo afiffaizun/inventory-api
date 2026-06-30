@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/afiffazun/inventory-api/internal/model"
+	"github.com/afiffazun/inventory-api/internal/repository"
 	"github.com/afiffazun/inventory-api/internal/service"
 	"gorm.io/gorm"
 )
@@ -39,12 +42,48 @@ func Version(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetItems(w http.ResponseWriter, r *http.Request) {
-	items, err := service.GetAllItems()
+	filter := repository.SearchFilter{
+		Search:   r.URL.Query().Get("search"),
+		Location: r.URL.Query().Get("location"),
+	}
+
+	if minStock := r.URL.Query().Get("min_stock"); minStock != "" {
+		if v, err := strconv.Atoi(minStock); err == nil {
+			filter.MinStock = v
+		}
+	}
+
+	if maxStock := r.URL.Query().Get("max_stock"); maxStock != "" {
+		if v, err := strconv.Atoi(maxStock); err == nil {
+			filter.MaxStock = v
+		}
+	}
+
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	if limit < 1 || limit > 100 {
+		limit = 10
+	}
+
+	items, total, err := service.GetItemsWithFilter(filter, page, limit)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "Failed to fetch items")
 		return
 	}
-	respondJSON(w, http.StatusOK, items)
+
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
+	respondJSON(w, http.StatusOK, model.PaginatedResponse[model.Item]{
+		Data:       items,
+		Page:       page,
+		Limit:      limit,
+		Total:      total,
+		TotalPages: totalPages,
+	})
 }
 
 func GetItem(w http.ResponseWriter, r *http.Request) {
@@ -145,4 +184,46 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func ExportItems(w http.ResponseWriter, r *http.Request) {
+	filter := repository.SearchFilter{
+		Search:   r.URL.Query().Get("search"),
+		Location: r.URL.Query().Get("location"),
+	}
+
+	if minStock := r.URL.Query().Get("min_stock"); minStock != "" {
+		if v, err := strconv.Atoi(minStock); err == nil {
+			filter.MinStock = v
+		}
+	}
+
+	if maxStock := r.URL.Query().Get("max_stock"); maxStock != "" {
+		if v, err := strconv.Atoi(maxStock); err == nil {
+			filter.MaxStock = v
+		}
+	}
+
+	items, err := service.ExportItems(filter)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "Failed to export items")
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv")
+	w.Header().Set("Content-Disposition", "attachment;filename=items.csv")
+
+	writer := csv.NewWriter(w)
+	defer writer.Flush()
+
+	writer.Write([]string{"Code", "Name", "Stock", "Location"})
+
+	for _, item := range items {
+		writer.Write([]string{
+			item.Code,
+			item.Name,
+			strconv.Itoa(item.Stock),
+			item.Location,
+		})
+	}
 }

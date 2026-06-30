@@ -97,3 +97,24 @@ func assertErrorCode(t *testing.T, w *httptest.ResponseRecorder, expectedCode st
 		t.Errorf("expected error code '%s', got '%s'", expectedCode, resp.Error.Code)
 	}
 }
+
+func executeRequestWithQuery(t *testing.T, method, path, body string, handler http.HandlerFunc) *httptest.ResponseRecorder {
+	t.Helper()
+
+	var reqBody *bytes.Buffer
+	if body != "" {
+		reqBody = bytes.NewBufferString(body)
+	} else {
+		reqBody = bytes.NewBufferString("")
+	}
+
+	req := httptest.NewRequest(method, path, reqBody)
+	if body != "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	w := httptest.NewRecorder()
+	handler(w, req)
+
+	return w
+}

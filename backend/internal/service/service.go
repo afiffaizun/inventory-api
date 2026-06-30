@@ -38,3 +38,11 @@ func UpdateItem(id uint, item *model.Item) error {
 func DeleteItem(id uint) error {
 	return repository.DeleteItem(id)
 }
+
+func GetItemsWithFilter(filter repository.SearchFilter, page, limit int) ([]model.Item, int64, error) {
+	return repository.GetItemsWithFilter(filter, page, limit)
+}
+
+func ExportItems(filter repository.SearchFilter) ([]model.Item, error) {
+	return repository.ExportItems(filter)
+}

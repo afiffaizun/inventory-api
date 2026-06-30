@@ -13,3 +13,11 @@ type ErrorResponse struct {
 		Message string `json:"message"`
 	} `json:"error"`
 }
+
+type PaginatedResponse[T any] struct {
+	Data       []T   `json:"data"`
+	Page       int   `json:"page"`
+	Limit      int   `json:"limit"`
+	Total      int64 `json:"total"`
+	TotalPages int   `json:"total_pages"`
+}

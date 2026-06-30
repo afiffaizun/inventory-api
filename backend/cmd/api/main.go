@@ -46,6 +46,14 @@ func main() {
 		}
 	}))
 
+	http.HandleFunc("/items/export", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.ExportItems(w, r)
+	}))
+
 	http.HandleFunc("/items/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

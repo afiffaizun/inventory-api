@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/afiffazun/inventory-api/internal/config"
@@ -69,14 +71,17 @@ func TestGetItems(t *testing.T) {
 	tests := []struct {
 		name       string
 		setup      func(t *testing.T)
+		query      string
 		wantStatus int
 		wantCount  int
+		wantTotal  int64
 	}{
 		{
 			name:       "empty list",
 			setup:      func(t *testing.T) { setupTest() },
 			wantStatus: http.StatusOK,
 			wantCount:  0,
+			wantTotal:  0,
 		},
 		{
 			name: "returns items",
@@ -87,6 +92,139 @@ func TestGetItems(t *testing.T) {
 			},
 			wantStatus: http.StatusOK,
 			wantCount:  2,
+			wantTotal:  2,
+		},
+		{
+			name: "search by name",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?search=Laptop",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "search by code",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?search=ITEM002",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "filter by location",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?location=Gudang+A",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "filter by min stock",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?min_stock=20",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "filter by max stock",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?max_stock=20",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "pagination page 1",
+			setup: func(t *testing.T) {
+				setupTest()
+				for i := 1; i <= 15; i++ {
+					createTestItem(t, "ITEM"+strconv.Itoa(i), "Item "+strconv.Itoa(i), i, "Gudang A")
+				}
+			},
+			query:      "?page=1&limit=10",
+			wantStatus: http.StatusOK,
+			wantCount:  10,
+			wantTotal:  15,
+		},
+		{
+			name: "pagination page 2",
+			setup: func(t *testing.T) {
+				setupTest()
+				for i := 1; i <= 15; i++ {
+					createTestItem(t, "ITEM"+strconv.Itoa(i), "Item "+strconv.Itoa(i), i, "Gudang A")
+				}
+			},
+			query:      "?page=2&limit=10",
+			wantStatus: http.StatusOK,
+			wantCount:  5,
+			wantTotal:  15,
+		},
+		{
+			name: "invalid page defaults to 1",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+			},
+			query:      "?page=0",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "invalid limit defaults to 10",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+			},
+			query:      "?limit=0",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "limit over 100 defaults to 10",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+			},
+			query:      "?limit=200",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
+		},
+		{
+			name: "combined filters",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+				createTestItem(t, "ITEM003", "Keyboard", 25, "Gudang A")
+			},
+			query:      "?search=L&location=Gudang+A&min_stock=5&max_stock=30",
+			wantStatus: http.StatusOK,
+			wantCount:  1,
+			wantTotal:  1,
 		},
 	}
 
@@ -94,14 +232,27 @@ func TestGetItems(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
 
-			w := executeRequest(t, http.MethodGet, "/items", "", GetItems)
+			path := "/items" + tt.query
+			w := executeRequestWithQuery(t, http.MethodGet, path, "", GetItems)
 			assertStatus(t, w, tt.wantStatus)
 
-			var resp []model.Item
+			var resp model.PaginatedResponse[model.Item]
 			decodeJSON(t, w, &resp)
 
-			if len(resp) != tt.wantCount {
-				t.Errorf("expected %d items, got %d", tt.wantCount, len(resp))
+			if len(resp.Data) != tt.wantCount {
+				t.Errorf("expected %d items, got %d", tt.wantCount, len(resp.Data))
+			}
+
+			if resp.Total != tt.wantTotal {
+				t.Errorf("expected total %d, got %d", tt.wantTotal, resp.Total)
+			}
+
+			if resp.Page == 0 {
+				t.Error("expected non-zero page")
+			}
+
+			if resp.Limit == 0 {
+				t.Error("expected non-zero limit")
 			}
 		})
 	}
@@ -346,6 +497,96 @@ func TestDeleteItem(t *testing.T) {
 				database.DB.Model(&model.Item{}).Count(&count)
 				if count != 0 {
 					t.Errorf("expected 0 items after delete, got %d", count)
+				}
+			}
+		})
+	}
+}
+
+func TestExportItems(t *testing.T) {
+	tests := []struct {
+		name       string
+		setup      func(t *testing.T)
+		query      string
+		wantStatus int
+		wantLines  int
+		wantType   string
+	}{
+		{
+			name: "empty export",
+			setup: func(t *testing.T) {
+				setupTest()
+			},
+			wantStatus: http.StatusOK,
+			wantLines:  1,
+			wantType:   "text/csv",
+		},
+		{
+			name: "export all items",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			wantStatus: http.StatusOK,
+			wantLines:  3,
+			wantType:   "text/csv",
+		},
+		{
+			name: "export with search filter",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?search=Laptop",
+			wantStatus: http.StatusOK,
+			wantLines:  2,
+			wantType:   "text/csv",
+		},
+		{
+			name: "export with location filter",
+			setup: func(t *testing.T) {
+				setupTest()
+				createTestItem(t, "ITEM001", "Laptop", 10, "Gudang A")
+				createTestItem(t, "ITEM002", "Mouse", 50, "Gudang B")
+			},
+			query:      "?location=Gudang+B",
+			wantStatus: http.StatusOK,
+			wantLines:  2,
+			wantType:   "text/csv",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(t)
+
+			path := "/items/export" + tt.query
+			w := executeRequestWithQuery(t, http.MethodGet, path, "", ExportItems)
+			assertStatus(t, w, tt.wantStatus)
+
+			contentType := w.Header().Get("Content-Type")
+			if contentType != tt.wantType {
+				t.Errorf("expected Content-Type '%s', got '%s'", tt.wantType, contentType)
+			}
+
+			contentDisposition := w.Header().Get("Content-Disposition")
+			if !strings.Contains(contentDisposition, "attachment") {
+				t.Errorf("expected Content-Disposition to contain 'attachment', got '%s'", contentDisposition)
+			}
+
+			lines := strings.Split(strings.TrimSpace(w.Body.String()), "\n")
+			if len(lines) != tt.wantLines {
+				t.Errorf("expected %d lines (header + data), got %d", tt.wantLines, len(lines))
+				t.Logf("CSV output:\n%s", w.Body.String())
+			}
+
+			if len(lines) > 0 {
+				header := lines[0]
+				expectedHeader := "Code,Name,Stock,Location"
+				if header != expectedHeader {
+					t.Errorf("expected header '%s', got '%s'", expectedHeader, header)
 				}
 			}
 		})
