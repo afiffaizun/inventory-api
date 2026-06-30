@@ -134,6 +134,20 @@ func createTestWarehouse(t *testing.T, code, name string) string {
 	return strconv.FormatUint(uint64(warehouse.ID), 10)
 }
 
+func createTestWarehouseUint(t *testing.T, code, name string) uint {
+	t.Helper()
+
+	warehouse := model.Warehouse{
+		Code: code,
+		Name: name,
+	}
+	result := database.DB.Create(&warehouse)
+	if result.Error != nil {
+		t.Fatalf("failed to create test warehouse: %v", result.Error)
+	}
+	return warehouse.ID
+}
+
 func createTestCategory(t *testing.T, code, name string) string {
 	t.Helper()
 
@@ -146,4 +160,39 @@ func createTestCategory(t *testing.T, code, name string) string {
 		t.Fatalf("failed to create test category: %v", result.Error)
 	}
 	return strconv.FormatUint(uint64(category.ID), 10)
+}
+
+func createTestItemWithWarehouse(t *testing.T, code, name string, stock int, warehouseID uint) model.Item {
+	t.Helper()
+
+	wID := warehouseID
+	item := model.Item{
+		Code:        code,
+		Name:        name,
+		SKU:         code + "-SKU",
+		Stock:       stock,
+		WarehouseID: &wID,
+	}
+	result := database.DB.Create(&item)
+	if result.Error != nil {
+		t.Fatalf("failed to create test item: %v", result.Error)
+	}
+	return item
+}
+
+func createTestStockMovement(t *testing.T, itemID, warehouseID uint, movementType string, quantity int) model.StockMovement {
+	t.Helper()
+
+	movement := model.StockMovement{
+		ItemID:      itemID,
+		WarehouseID: warehouseID,
+		Type:        movementType,
+		Quantity:    quantity,
+		CreatedBy:   "test",
+	}
+	result := database.DB.Create(&movement)
+	if result.Error != nil {
+		t.Fatalf("failed to create test stock movement: %v", result.Error)
+	}
+	return movement
 }

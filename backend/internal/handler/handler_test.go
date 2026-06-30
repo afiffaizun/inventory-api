@@ -22,6 +22,9 @@ func TestMain(m *testing.M) {
 }
 
 func setupTest() {
+	database.DB.Exec("DELETE FROM stock_opname_items")
+	database.DB.Exec("DELETE FROM stock_opnames")
+	database.DB.Exec("DELETE FROM stock_movements")
 	database.DB.Exec("DELETE FROM items")
 	database.DB.Exec("DELETE FROM warehouses")
 	database.DB.Exec("DELETE FROM categories")

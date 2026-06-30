@@ -150,6 +150,89 @@ func main() {
 		}
 	}))
 
+	// Stock Movement routes
+	http.HandleFunc("/stock-movements", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetStockMovements(w, r)
+		case http.MethodPost:
+			handler.CreateStockMovement(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/stock-movements/transfer", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.TransferStock(w, r)
+	}))
+
+	http.HandleFunc("/stock-movements/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.GetStockMovement(w, r)
+	}))
+
+	// Stock History route
+	http.HandleFunc("/items/{id}/stock-history", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.GetStockHistory(w, r)
+	}))
+
+	// Stock by Warehouse route
+	http.HandleFunc("/warehouses/{id}/stock", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.GetStockByWarehouse(w, r)
+	}))
+
+	// Stock Summary route
+	http.HandleFunc("/stock-summary", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.GetStockSummary(w, r)
+	}))
+
+	// Stock Opname routes
+	http.HandleFunc("/stock-opnames", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetStockOpnames(w, r)
+		case http.MethodPost:
+			handler.CreateStockOpname(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/stock-opnames/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.GetStockOpname(w, r)
+	}))
+
+	http.HandleFunc("/stock-opnames/{id}/complete", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.CompleteStockOpname(w, r)
+	}))
+
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("Inventory API running on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))

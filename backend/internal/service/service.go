@@ -104,3 +104,45 @@ func UpdateCategory(id uint, category *model.Category) error {
 func DeleteCategory(id uint) error {
 	return repository.DeleteCategory(id)
 }
+
+// Stock Movement functions
+func GetStockMovements(filter repository.StockMovementFilter, page, limit int) ([]model.StockMovement, int64, error) {
+	return repository.GetStockMovements(filter, page, limit)
+}
+
+func GetStockMovementByID(id uint) (*model.StockMovement, error) {
+	return repository.GetStockMovementByID(id)
+}
+
+func CreateStockMovement(movement *model.StockMovement) error {
+	return repository.CreateStockMovement(movement)
+}
+
+func GetStockHistory(itemID uint, page, limit int) ([]model.StockMovement, int64, error) {
+	return repository.GetStockHistory(itemID, page, limit)
+}
+
+func GetStockByWarehouse(warehouseID uint) ([]model.Item, error) {
+	return repository.GetStockByWarehouse(warehouseID)
+}
+
+func GetStockSummary() ([]repository.StockSummary, error) {
+	return repository.GetStockSummary()
+}
+
+// Stock Opname functions
+func GetStockOpnames(page, limit int) ([]model.StockOpname, int64, error) {
+	return repository.GetStockOpnames(page, limit)
+}
+
+func GetStockOpnameByID(id uint) (*model.StockOpname, error) {
+	return repository.GetStockOpnameByID(id)
+}
+
+func CreateStockOpname(opname *model.StockOpname) error {
+	return repository.CreateStockOpname(opname)
+}
+
+func CompleteStockOpname(id uint) error {
+	return repository.CompleteStockOpname(id)
+}

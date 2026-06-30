@@ -1,6 +1,7 @@
 # Binaries
 inventory-api
 /api
+backend/api
 *.exe
 *.exe~
 *.dll
