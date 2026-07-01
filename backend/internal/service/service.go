@@ -146,3 +146,111 @@ func CreateStockOpname(opname *model.StockOpname) error {
 func CompleteStockOpname(id uint) error {
 	return repository.CompleteStockOpname(id)
 }
+
+// Customer functions
+func GetCustomers(filter repository.CustomerFilter, page, limit int) ([]model.Customer, int64, error) {
+	return repository.GetCustomers(filter, page, limit)
+}
+
+func GetAllCustomers() ([]model.Customer, error) {
+	return repository.GetAllCustomers()
+}
+
+func GetCustomerByID(id uint) (*model.Customer, error) {
+	return repository.GetCustomerByID(id)
+}
+
+func CreateCustomer(customer *model.Customer) error {
+	return repository.CreateCustomer(customer)
+}
+
+func UpdateCustomer(id uint, customer *model.Customer) error {
+	return repository.UpdateCustomer(id, customer)
+}
+
+func DeleteCustomer(id uint) error {
+	return repository.DeleteCustomer(id)
+}
+
+// Supplier functions
+func GetSuppliers(filter repository.SupplierFilter, page, limit int) ([]model.Supplier, int64, error) {
+	return repository.GetSuppliers(filter, page, limit)
+}
+
+func GetAllSuppliers() ([]model.Supplier, error) {
+	return repository.GetAllSuppliers()
+}
+
+func GetSupplierByID(id uint) (*model.Supplier, error) {
+	return repository.GetSupplierByID(id)
+}
+
+func CreateSupplier(supplier *model.Supplier) error {
+	return repository.CreateSupplier(supplier)
+}
+
+func UpdateSupplier(id uint, supplier *model.Supplier) error {
+	return repository.UpdateSupplier(id, supplier)
+}
+
+func DeleteSupplier(id uint) error {
+	return repository.DeleteSupplier(id)
+}
+
+// Sales Order functions
+func GetSalesOrders(filter repository.SalesOrderFilter, page, limit int) ([]model.SalesOrder, int64, error) {
+	return repository.GetSalesOrders(filter, page, limit)
+}
+
+func GetSalesOrderByID(id uint) (*model.SalesOrder, error) {
+	return repository.GetSalesOrderByID(id)
+}
+
+func CreateSalesOrder(order *model.SalesOrder) error {
+	return repository.CreateSalesOrder(order)
+}
+
+func UpdateSalesOrder(id uint, order *model.SalesOrder) error {
+	return repository.UpdateSalesOrder(id, order)
+}
+
+func DeleteSalesOrder(id uint) error {
+	return repository.DeleteSalesOrder(id)
+}
+
+func ConfirmSalesOrder(id uint) error {
+	return repository.ConfirmSalesOrder(id)
+}
+
+func CancelSalesOrder(id uint) error {
+	return repository.CancelSalesOrder(id)
+}
+
+// Purchase Order functions
+func GetPurchaseOrders(filter repository.PurchaseOrderFilter, page, limit int) ([]model.PurchaseOrder, int64, error) {
+	return repository.GetPurchaseOrders(filter, page, limit)
+}
+
+func GetPurchaseOrderByID(id uint) (*model.PurchaseOrder, error) {
+	return repository.GetPurchaseOrderByID(id)
+}
+
+func CreatePurchaseOrder(order *model.PurchaseOrder) error {
+	return repository.CreatePurchaseOrder(order)
+}
+
+func UpdatePurchaseOrder(id uint, order *model.PurchaseOrder) error {
+	return repository.UpdatePurchaseOrder(id, order)
+}
+
+func DeletePurchaseOrder(id uint) error {
+	return repository.DeletePurchaseOrder(id)
+}
+
+func ConfirmPurchaseOrder(id uint) error {
+	return repository.ConfirmPurchaseOrder(id)
+}
+
+func CancelPurchaseOrder(id uint) error {
+	return repository.CancelPurchaseOrder(id)
+}

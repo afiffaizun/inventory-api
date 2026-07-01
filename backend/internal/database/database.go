@@ -31,6 +31,12 @@ func Migrate() {
 		&model.StockMovement{},
 		&model.StockOpname{},
 		&model.StockOpnameItem{},
+		&model.Customer{},
+		&model.Supplier{},
+		&model.SalesOrder{},
+		&model.SalesOrderItem{},
+		&model.PurchaseOrder{},
+		&model.PurchaseOrderItem{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)

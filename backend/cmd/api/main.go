@@ -233,6 +233,138 @@ func main() {
 		handler.CompleteStockOpname(w, r)
 	}))
 
+	// Customer routes
+	http.HandleFunc("/customers", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetCustomers(w, r)
+		case http.MethodPost:
+			handler.CreateCustomer(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/customers/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetCustomer(w, r)
+		case http.MethodPut:
+			handler.UpdateCustomer(w, r)
+		case http.MethodDelete:
+			handler.DeleteCustomer(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	// Supplier routes
+	http.HandleFunc("/suppliers", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetSuppliers(w, r)
+		case http.MethodPost:
+			handler.CreateSupplier(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/suppliers/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetSupplier(w, r)
+		case http.MethodPut:
+			handler.UpdateSupplier(w, r)
+		case http.MethodDelete:
+			handler.DeleteSupplier(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	// Sales Order routes
+	http.HandleFunc("/sales-orders", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetSalesOrders(w, r)
+		case http.MethodPost:
+			handler.CreateSalesOrder(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/sales-orders/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetSalesOrder(w, r)
+		case http.MethodPut:
+			handler.UpdateSalesOrder(w, r)
+		case http.MethodDelete:
+			handler.DeleteSalesOrder(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/sales-orders/{id}/confirm", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.ConfirmSalesOrder(w, r)
+	}))
+
+	http.HandleFunc("/sales-orders/{id}/cancel", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.CancelSalesOrder(w, r)
+	}))
+
+	// Purchase Order routes
+	http.HandleFunc("/purchase-orders", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetPurchaseOrders(w, r)
+		case http.MethodPost:
+			handler.CreatePurchaseOrder(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/purchase-orders/{id}", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			handler.GetPurchaseOrder(w, r)
+		case http.MethodPut:
+			handler.UpdatePurchaseOrder(w, r)
+		case http.MethodDelete:
+			handler.DeletePurchaseOrder(w, r)
+		default:
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	}))
+
+	http.HandleFunc("/purchase-orders/{id}/confirm", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.ConfirmPurchaseOrder(w, r)
+	}))
+
+	http.HandleFunc("/purchase-orders/{id}/cancel", corsMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handler.CancelPurchaseOrder(w, r)
+	}))
+
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("Inventory API running on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
